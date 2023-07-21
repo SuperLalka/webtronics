@@ -1,0 +1,40 @@
+version: '3'
+
+
+volumes:
+  postgres_data: {}
+  postgres_data_backups: {}
+
+
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: ./compose/fastapi/Dockerfile
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+     - ./app:/app
+    environment:
+      - POSTGRES_DB=db_name
+      - POSTGRES_USER=db_user
+      - POSTGRES_PASSWORD=db_pass
+      - POSTGRES_HOST=postgres
+    ports:
+      - "8000:80"
+    entrypoint: /start-reload.sh
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_backups:/backups
+    environment:
+      - POSTGRES_DB=db_name
+      - POSTGRES_USER=db_user
+      - POSTGRES_PASSWORD=db_pass
+    ports:
+      - "5432:5432"
