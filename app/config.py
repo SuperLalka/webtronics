@@ -17,3 +17,7 @@ class Config:
     DATABASE_URL = f"{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}/{POSTGRES_DB}"
     DATABASE_URL_ASYNC = "postgresql+asyncpg://" + DATABASE_URL
     DATABASE_URL_SYNC = "postgresql://" + DATABASE_URL
+
+    EMAIL_HUNTER_API = os.getenv("EMAIL_HUNTER_API", "https://api.hunter.io/v2/")
+    EMAIL_HUNTER_API_VERIFY = EMAIL_HUNTER_API + "email-verifier"
+    EMAIL_HUNTER_API_KEY = os.getenv("EMAIL_HUNTER_API_KEY", "fc8656ee1f3b4f2d6623fb730f7dd94b6a532d7e")

@@ -41,7 +41,7 @@ class UserManager:
         query = query.on_conflict_do_nothing(index_elements=["username"])
         return await self.database.execute(query)
 
-    async def is_exists(self, data: dict):
+    async def is_exists(self, data: dict) -> bool:
         query = self.base_query.where(
             self.model.c.username == data["username"],
             self.model.c.password == data["password"],

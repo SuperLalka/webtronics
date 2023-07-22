@@ -7,7 +7,6 @@ import authentication
 import database
 from app.routes import router
 
-
 app = FastAPI()
 app.add_middleware(database.DBSessionMiddleware)
 app.add_middleware(authentication.JWTAuthSessionMiddleware)

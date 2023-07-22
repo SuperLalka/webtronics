@@ -23,6 +23,16 @@ def unauthorized():
     return JSONResponse(status_code=401, content=response)
 
 
+def forbidden():
+    response = {
+        "timestamp": str(datetime.datetime.now()),
+        "status": 403,
+        "error": "Forbidden",
+        "message": "You're not allowed to access",
+    }
+    return JSONResponse(status_code=403, content=response)
+
+
 def not_found(error_text):
     response = {
         "timestamp": str(datetime.datetime.now()),
