@@ -21,6 +21,7 @@ services:
       - POSTGRES_USER=db_user
       - POSTGRES_PASSWORD=db_pass
       - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
     ports:
       - "8000:80"
     entrypoint: /start-reload.sh

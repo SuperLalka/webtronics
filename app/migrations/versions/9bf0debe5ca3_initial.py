@@ -1,16 +1,13 @@
 """Initial
 
-Revision ID: fa17925efe3a
-Revises: 
-Create Date: 2023-07-22 16:03:30.661144
+Revision ID: 9bf0debe5ca3
 
 """
 from alembic import op
 import sqlalchemy as sa
 
 
-# revision identifiers, used by Alembic.
-revision = 'fa17925efe3a'
+revision = '9bf0debe5ca3'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,7 +24,7 @@ def upgrade() -> None:
         sa.UniqueConstraint('username')
     )
     op.create_table('posts',
-        sa.Column('id', sa.BIGINT(), nullable=False),
+        sa.Column('id', sa.BIGINT(), autoincrement=True, nullable=False),
         sa.Column('title', sa.String(length=100), nullable=True),
         sa.Column('text', sa.Text(), nullable=True),
         sa.Column('author_id', sa.Integer(), nullable=False),
@@ -44,13 +41,11 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('post_id', 'user_id'),
         sa.UniqueConstraint('post_id', 'user_id', name='user_posts_ratings_idx')
     )
-    op.create_index(op.f('ix_posts_rating_post_id'), 'posts_rating', ['post_id'], unique=False)
-    op.create_index(op.f('ix_posts_rating_user_id'), 'posts_rating', ['user_id'], unique=False)
+    op.create_index('user_posts_ratings_un', 'posts_rating', ['post_id', 'user_id'], unique=False)
 
 
 def downgrade() -> None:
-    op.drop_table('users')
-    op.drop_index(op.f('ix_posts_rating_user_id'), table_name='posts_rating')
-    op.drop_index(op.f('ix_posts_rating_post_id'), table_name='posts_rating')
+    op.drop_index('user_posts_ratings_un', table_name='posts_rating')
     op.drop_table('posts_rating')
     op.drop_table('posts')
+    op.drop_table('users')

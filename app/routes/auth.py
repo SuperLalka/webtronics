@@ -19,6 +19,7 @@ def get_config():
 @router.post('/signup/', include_in_schema=False)
 async def signup(request: Request, data: CreateUserSchema):
     await UserManager(request.state.db_session).create(data.dict(exclude_none=True))
+    return {"msg": "Successfully signup"}
 
 
 @router.post('/login')

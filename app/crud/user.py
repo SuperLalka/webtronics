@@ -21,20 +21,19 @@ class UserManager:
 
     @property
     def base_query(self):
-        return select(self.model)
-
-    async def get_list(self):
-        state = await self.database.execute(self.base_query)
-        result = state.unique()
-        return (r["UserOrm"] for r in result)
+        return select(UserOrm)
 
     async def get_by_id(self, item_id: int) -> Optional[UserOrm]:
         query = self.base_query.where(self.model.c.id == item_id)
         state = await self.database.execute(query)
-        result = state.unique().one_or_none()
-        if result:
-            return result["UserOrm"]
-        return result
+        result = state.mappings().one_or_none()
+        return result.get("PostOrm")
+
+    async def get_by_name(self, item_username: str) -> Optional[UserOrm]:
+        query = self.base_query.where(self.model.c.username == item_username)
+        state = await self.database.execute(query)
+        result = state.mappings().one_or_none()
+        return result["UserOrm"]
 
     async def create(self, data: dict):
         query = insert(UserOrm).values(**data)

@@ -5,10 +5,9 @@ from sqlalchemy import (
     Column,
     String,
 )
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
-Base = declarative_base()
+from .base import Base
 
 
 class UserOrm(Base):
@@ -18,7 +17,7 @@ class UserOrm(Base):
     password = Column(String(100))
 
     user_posts = relationship("models.posts.PostOrm", back_populates="author")
-    user_ratings = relationship("models.posts.PostRatingOrm", back_populates="user")
+    user_ratings = relationship("models.posts.PostRatingOrm", backref=backref("user"))
 
     __tablename__ = "users"
 

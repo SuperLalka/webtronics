@@ -7,5 +7,9 @@ RUN apt-get update -y \
 
 COPY ./app /app
 
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install poetry
+
+COPY poetry.lock pyproject.toml /app/
+
+RUN poetry config virtualenvs.create false \
+  && poetry install --no-interaction --no-ansi

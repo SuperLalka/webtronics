@@ -1,10 +1,11 @@
 from typing import List
 
 from fastapi import APIRouter, Body, Request
+from starlette.responses import JSONResponse
 
-from app.crud.post import PostManager
+from app.crud.post import PostManager, PostRatingManager
 from app.routes.utils import forbidden, not_found
-from app.schemas.posts import CreatePostSchema, RetrievePostSchema, UpdatePostSchema
+from app.schemas.posts import CreatePostSchema, PostRatingSchema, RetrievePostSchema, UpdatePostSchema
 
 router = APIRouter(prefix="/posts", tags=["posts"])
 
@@ -28,7 +29,7 @@ async def get_post_by_id(request: Request, post_id: int):
     return post
 
 
-@router.post("/", response_model=CreatePostSchema)
+@router.post("/", response_model=RetrievePostSchema)
 async def create_post(
     request: Request,
     post_data: CreatePostSchema = Body(...)
@@ -36,10 +37,10 @@ async def create_post(
     return await PostManager(request.state.db_session).create(post_data.dict())
 
 
-@router.put("/{post_id}", response_model=UpdatePostSchema)
+@router.put("/{post_id}", response_model=RetrievePostSchema)
 @router.put(
     "/{post_id}/",
-    response_model=UpdatePostSchema,
+    response_model=RetrievePostSchema,
     include_in_schema=False,
 )
 async def update_post(
@@ -66,4 +67,31 @@ async def delete_post(request: Request, post_id: int):
     if request.user.id != post.author_id:
         return forbidden()
 
-    return await PostManager(request.state.db_session).delete(post_id)
+    await PostManager(request.state.db_session).delete(post_id)
+    return JSONResponse(status_code=200, content={"success": True})
+
+
+@router.post("/{post_id}/like")
+@router.post("/{post_id}/like/", include_in_schema=False)
+async def delete_post(
+        request: Request,
+        post_id: int,
+        post_rating_data: PostRatingSchema = Body(...)
+):
+    post = await PostManager(request.state.db_session).get_by_id(post_id)
+    if not post:
+        return not_found(f"Couldn't find post with id {post_id}")
+
+    if request.user.id == post.author_id:
+        return forbidden()
+
+    post_rating_data = post_rating_data.dict()
+    post_rating_data["post_id"] = post_id
+    post_rating_data["user_id"] = request.user.id
+
+    if post_rating_data["value"] is None:
+        await PostRatingManager(request.state.db_session).delete(post_rating_data)
+        return JSONResponse(status_code=200, content={"success": True})
+
+    await PostRatingManager(request.state.db_session).create_or_update(post_rating_data)
+    return JSONResponse(status_code=200, content={"success": True})
