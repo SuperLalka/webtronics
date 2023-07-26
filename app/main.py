@@ -6,7 +6,11 @@ import authentication
 import database
 from app.routes import router
 
-app = FastAPI()
+app = FastAPI(
+    openapi_url="/documentation/openapi.json",
+    redoc_url="/documentation/redoc",
+    docs_url="/documentation/docs",
+)
 app.add_middleware(AuthenticationMiddleware, backend=authentication.BearerTokenAuthBackend())
 app.add_middleware(authentication.JWTAuthSessionMiddleware)
 app.add_middleware(database.DBSessionMiddleware)

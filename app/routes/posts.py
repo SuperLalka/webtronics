@@ -73,7 +73,7 @@ async def delete_post(request: Request, post_id: int):
 
 @router.post("/{post_id}/like")
 @router.post("/{post_id}/like/", include_in_schema=False)
-async def delete_post(
+async def post_rating(
         request: Request,
         post_id: int,
         post_rating_data: PostRatingSchema = Body(...)

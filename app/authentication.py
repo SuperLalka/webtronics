@@ -9,10 +9,18 @@ from app.crud.user import UserManager
 from app.database import async_session
 from app.routes.utils import unauthorized
 
+urls_without_authorize = [
+    "/auth/",
+    "/documentation/"
+]
+
 
 class JWTAuthSessionMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-        if not request.url.path.startswith("/auth/"):
+        if not any([
+            request.url.path.startswith(path)
+            for path in urls_without_authorize
+        ]):
             try:
                 Authorize = AuthJWT(request)
                 Authorize.jwt_required()
