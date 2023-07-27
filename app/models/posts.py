@@ -70,7 +70,11 @@ class PostOrm(Base):
     @property
     def likes_and_dislikes(self):
         values = [x.value for x in self.post_ratings]
-        return collections.Counter(values)
+        values_counter = collections.Counter(values)
+        return {
+            "likes": values_counter.get(1, 0),
+            "dislikes": values_counter.get(-1, 0),
+        }
 
 
 post = inspect(PostOrm).local_table

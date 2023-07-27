@@ -21,3 +21,5 @@ class Config:
     EMAIL_HUNTER_API = os.getenv("EMAIL_HUNTER_API", "https://api.hunter.io/v2/")
     EMAIL_HUNTER_API_VERIFY = EMAIL_HUNTER_API + "email-verifier"
     EMAIL_HUNTER_API_KEY = os.getenv("EMAIL_HUNTER_API_KEY", "fc8656ee1f3b4f2d6623fb730f7dd94b6a532d7e")
+
+    CACHE_TTL = os.getenv("CACHE_TTL", 10 * 60)

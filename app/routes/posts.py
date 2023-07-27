@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Body, Request
 from starlette.responses import JSONResponse
 
+from app.cache.middlewares import CacheMiddleware
 from app.crud.post import PostManager, PostRatingManager
 from app.routes.utils import forbidden, not_found
 from app.schemas.posts import CreatePostSchema, PostRatingSchema, RetrievePostSchema, UpdatePostSchema
@@ -71,6 +72,19 @@ async def delete_post(request: Request, post_id: int):
     return JSONResponse(status_code=200, content={"success": True})
 
 
+@router.get("/{post_id}/like")
+@router.get(
+    "/{post_id}/like/",
+    include_in_schema=False,
+)
+async def get_post_rating(request: Request, post_id: int):
+    post = await PostManager(request.state.db_session).get_by_id(post_id)
+    if not post:
+        return not_found(f"Couldn't find post with id {post_id}")
+
+    return post.likes_and_dislikes
+
+
 @router.post("/{post_id}/like")
 @router.post("/{post_id}/like/", include_in_schema=False)
 async def post_rating(
@@ -91,7 +105,8 @@ async def post_rating(
 
     if post_rating_data["value"] is None:
         await PostRatingManager(request.state.db_session).delete(post_rating_data)
-        return JSONResponse(status_code=200, content={"success": True})
+    else:
+        await PostRatingManager(request.state.db_session).create_or_update(post_rating_data)
 
-    await PostRatingManager(request.state.db_session).create_or_update(post_rating_data)
+    await CacheMiddleware.invalidate_cache(f"*/posts/{post_id}/like*")
     return JSONResponse(status_code=200, content={"success": True})

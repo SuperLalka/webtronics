@@ -4,6 +4,7 @@ version: '3'
 volumes:
   postgres_data: {}
   postgres_data_backups: {}
+  redis_data: {}
 
 
 services:
@@ -39,3 +40,11 @@ services:
       - POSTGRES_PASSWORD=db_pass
     ports:
       - "5432:5432"
+
+  cache-redis:
+    image: redis:6.2.6-alpine
+    container_name: cache-redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    command: '--appendonly yes'

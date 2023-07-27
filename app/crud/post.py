@@ -3,6 +3,7 @@ from typing import Optional
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncConnection
+from sqlalchemy.orm import selectinload
 
 from app.models.posts import (
     PostOrm,
@@ -23,7 +24,8 @@ class PostManager:
 
     @property
     def base_query(self):
-        return select(PostOrm)
+        return select(PostOrm) \
+            .options(selectinload(PostOrm.post_ratings))
 
     async def get_list(self):
         state = await self.database.execute(self.base_query)

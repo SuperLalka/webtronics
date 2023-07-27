@@ -1,10 +1,13 @@
+import logging
 import requests
 from typing import Union
 
 from pydantic import BaseModel, validator
 
 from app.config import Config
-from app.logger import logger
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserSchema(BaseModel):
